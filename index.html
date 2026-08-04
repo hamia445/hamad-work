@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Raja Hamad Furniture — Crafted in 3D Perfection</title>
+
+<!-- Upgraded Premium Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* Bright Luxury Palette */
+    --bg-base: #F9F8F6;          /* Warm Ivory / Alabaster */
+    --text-main: #1A1814;        /* Deep Royal Contrast / Charcoal */
+    --text-muted: #5A5549;       /* Rich warm grey for readability */
+    --gold: #D4AF37;             /* Champagne Gold */
+    --gold-light: #F3E5AB;       /* Sparkling Gold */
+    --gold-glow: rgba(212, 175, 55, 0.4);
+    
+    /* High-transparency frosted glass */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.9);
+    --glass-gold-border: rgba(212, 175, 55, 0.3);
+    
+    --whatsapp: #25D366;
+    --whatsapp-glow: rgba(37, 211, 102, 0.35);
+  }
+  
+  * { margin:0; padding:0; box-sizing:border-box; }
+  
+  body {
+    background: var(--bg-base);
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, .playfair { 
+    font-family: 'Playfair Display', serif; 
+    font-weight: 700; 
+    line-height: 1.15; 
+  }
+  
+  em { font-style: italic; color: var(--gold); }
+  ::selection { background: var(--gold); color: #fff; }
+
+  /* ============ CANVAS (Bright Gradient Backdrop) ============ */
+  #webgl {
+    position: fixed; inset: 0; width: 100vw; height: 100vh;
+    display: block; z-index: 0;
+    background: radial-gradient(ellipse at 50% 40%, #FFFFFF 0%, #E8E3D2 85%);
+  }
+
+  /* ============ LOADER ============ */
+  #loader {
+    position: fixed; inset: 0; z-index: 500;
+    background: var(--bg-base);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    transition: opacity .6s ease, visibility .6s ease;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .loader-ring {
+    width: 50px; height: 50px; border-radius: 50%;
+    border: 2px solid var(--gold-light); border-top-color: var(--gold);
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 20px var(--gold-glow);
+  }
+  #loader p { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-muted); }
+  #loader .pct { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 24px; font-weight: 700; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #load-error {
+    position: fixed; inset: 0; z-index: 600;
+    background: rgba(249, 248, 246, 0.96); display: none; align-items: center; justify-content: center; padding: 32px;
+  }
+  #load-error.show { display: flex; color: var(--text-main); }
+
+  /* ============ HEADER & PROFILE ============ */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; padding: 25px 5vw;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 42px; height: 42px; border-radius: 50%; 
+    border: 1px solid var(--gold);
+    background: rgba(255, 255, 255, 0.6);
+    display: flex; align-items: center; justify-content: center; 
+    font-family: 'Playfair Display', serif; color: var(--gold); font-size: 18px; font-weight: 700;
+    box-shadow: 0 0 15px var(--gold-glow), inset 0 0 10px rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+  }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: 0.03em; color: var(--text-main); }
+  .logo-text small { display: block; font-family: 'Poppins', sans-serif; font-size: 9px; letter-spacing: 0.35em; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  .profile-8d {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-gold-border);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05), inset 0 2px 10px rgba(255,255,255,1);
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .profile-8d:hover {
+    border-color: var(--gold);
+    box-shadow: 0 0 25px var(--gold-glow), inset 0 0 15px rgba(255,255,255,1);
+    transform: scale(1.05);
+  }
+  .profile-8d svg { width: 20px; height: 20px; fill: var(--gold); }
+
+  /* ============ HERO SECTIONS (Warm Ivory Glassmorphism) ============ */
+  main.content-wrapper { position: relative; z-index: 2; }
+  .panel-section { min-height: 100vh; display: flex; align-items: center; padding: 0 6vw; position: relative; }
+
+  .text-block {
+    max-width: 500px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 50px 45px;
+    opacity: 0;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.9), inset 0 0 20px rgba(212,175,55,0.05);
+  }
+  .text-block .eyebrow { display: block; font-size: 11px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; font-weight: 600; }
+  .text-block h1 { font-size: clamp(36px, 4.8vw, 60px); color: var(--text-main); margin-bottom: 20px; }
+  .text-block h2 { font-size: clamp(28px, 3.5vw, 42px); color: var(--text-main); margin-bottom: 20px; }
+  .text-block p { font-size: 15px; line-height: 1.9; color: var(--text-muted); font-weight: 400; }
+
+  #sec1 { justify-content: center; }
+  #sec1 .text-block { max-width: 650px; text-align: center; margin: 0 auto; }
+  #sec2 { justify-content: flex-start; }
+  #sec3 { justify-content: center; }
+  #sec3 .text-block { max-width: 560px; text-align: center; margin: 0 auto; }
+
+  .scroll-cue {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--text-muted); font-weight: 600;
+  }
+  .scroll-cue .chev {
+    width: 2px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: cueMove 2s ease-in-out infinite;
+  }
+  @keyframes cueMove { 0%,100%{opacity:0.2; transform:translateY(0);} 50%{opacity:1; transform:translateY(8px);} }
+
+  /* ============ HIGH-IMPACT CATALOG SECTION ============ */
+  .catalog-section {
+    position: relative; z-index: 10;
+    background: var(--bg-base); 
+    padding: 120px 5vw;
+    border-top: 1px solid rgba(212,175,55,0.2);
+  }
+  .catalog-header { text-align: center; margin-bottom: 70px; }
+  .catalog-header h2 { font-size: 42px; color: var(--text-main); margin-bottom: 16px; }
+  .catalog-header p { color: var(--text-muted); font-size: 15px; letter-spacing: 0.05em; }
+
+  .catalog-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 40px;
+    max-width: 1400px; margin: 0 auto;
+  }
+
+  .catalog-card {
+    perspective: 1200px;
+    opacity: 0; transform: translateY(40px); /* For JS Reveal */
+  }
+  
+  .catalog-card-inner {
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06), inset 0 0 15px rgba(255,255,255,1);
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), border-color 0.4s, box-shadow 0.4s;
+    transform-style: preserve-3d;
+  }
+  
+  .catalog-card:hover .catalog-card-inner {
+    border-color: var(--gold);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.12), inset 0 0 30px var(--gold-glow), 0 0 25px var(--gold-glow);
+  }
+
+  .card-img-wrap {
+    width: 100%; height: 280px; border-radius: 10px; overflow: hidden;
+    margin-bottom: 24px; position: relative;
+    transform: translateZ(40px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .card-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.7s ease; filter: brightness(0.95);
+  }
+  .catalog-card:hover .card-img-wrap img { transform: scale(1.08); filter: brightness(1.05); }
+  
+  .card-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+    border: 1px solid var(--gold); color: var(--gold);
+    padding: 6px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    border-radius: 30px; font-weight: 600;
+  }
+
+  .card-content { transform: translateZ(50px); }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 8px; color: var(--text-main); font-weight: 700; }
+  .card-price { font-size: 16px; color: var(--gold); font-weight: 600; margin-bottom: 20px; }
+  
+  .card-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+    padding: 14px; background: transparent; border: 1px solid var(--whatsapp);
+    color: var(--text-main); font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+    border-radius: 8px; cursor: pointer; transition: all 0.3s;
+  }
+  .card-btn svg { width: 16px; height: 16px; fill: var(--whatsapp); transition: fill 0.3s; }
+  .catalog-card:hover .card-btn { background: var(--whatsapp); color: #fff; box-shadow: 0 0 20px var(--whatsapp-glow); border-color: var(--whatsapp); }
+  .catalog-card:hover .card-btn svg { fill: #fff; }
+
+  /* ============ FLOATING WHATSAPP ============ */
+  .wa-float-8d {
+    position: fixed; bottom: 40px; right: 40px; z-index: 100;
+    width: 65px; height: 65px; border-radius: 50%;
+    background: rgba(37, 211, 102, 0.15);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(37, 211, 102, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 0 0 20px rgba(37,211,102,0.4);
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .wa-float-8d svg { width: 32px; height: 32px; fill: #25D366; filter: drop-shadow(0 0 8px rgba(37,211,102,0.8)); }
+  .wa-float-8d::before {
+    content: ""; position: absolute; inset: -5px; border-radius: 50%;
+    border: 1px solid var(--whatsapp);
+    animation: waPulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  }
+  .wa-float-8d:hover { transform: scale(1.1) translateY(-5px); background: rgba(37, 211, 102, 0.25); }
+  @keyframes waPulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.4); opacity: 0; } }
+
+  footer { position: relative; z-index: 10; background: #E8E3D2; padding: 40px 6vw; text-align: center; border-top: 1px solid rgba(212,175,55,0.2); }
+  footer p { font-size: 12px; color: var(--text-muted); letter-spacing: 0.05em; font-weight: 500; }
+
+  @media(max-width: 880px) {
+    .panel-section { justify-content: center !important; }
+    .text-block { max-width: 100%; padding: 35px 25px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="webgl"></canvas>
+
+<div id="loader">
+  <div class="loader-ring"></div>
+  <p>Loading Masterpiece</p>
+  <div class="pct" id="loadPct">0%</div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">AN</div>
+    <div class="logo-text">Al-Noor<small>LUXURY FURNITURE</small></div>
+  </div>
+  <div class="profile-8d">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+  </div>
+</header>
+
+<main class="content-wrapper">
+  <!-- Hero Sec 1 -->
+  <section class="panel-section" id="sec1">
+    <div class="text-block">
+      <span class="eyebrow">Al-Noor Luxury Furniture</span>
+      <h1>Crafted in 3D <em>Perfection</em></h1>
+      <p>Every joint, every grain, every stitch — rendered true to the piece in our workshop. Scroll to walk around it.</p>
+    </div>
+    <div class="scroll-cue"><span>Scroll</span><div class="chev"></div></div>
+  </section>
+
+  <!-- Hero Sec 2 -->
+  <section class="panel-section" id="sec2">
+    <div class="text-block">
+      <span class="eyebrow">Materials</span>
+      <h2>100% Solid Sheesham &amp; Premium Leather</h2>
+      <p>Solid Sheesham frame, hand-joined, upholstered in full-grain leather that's finished to age gracefully rather than wear out.</p>
+    </div>
+  </section>
+
+  <!-- Hero Sec 3 -->
+  <section class="panel-section" id="sec3">
+    <div class="text-block">
+      <span class="eyebrow">Ready When You Are</span>
+      <h2>Bring This Home</h2>
+      <p>Send us your room dimensions and preferred finish — our design team replies with a quote within the hour.</p>
+    </div>
+  </section>
+</main>
+
+<!-- BRIGHT & VIBRANT CATALOG SECTION -->
+<section class="catalog-section" id="catalog">
+  <div class="catalog-header">
+    <h2>Curated Mastery</h2>
+    <p>Explore our finest collections, carved for generations.</p>
+  </div>
+  
+  <div class="catalog-grid">
+    
+    <!-- Product 1 -->
+    <div class="catalog-card">
+      <div class="catalog-card-inner">
+        <div class="card-img-wrap">
+          <div class="card-badge">Bright Gold & Cream</div>
+          <img src="https://images.unsplash.com/photo-1540518614846-7ede433c4ef0?auto=format&fit=crop&w=1200&q=85" alt="Royal Bed">
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">The Royal Velvet Bed</h3>
+          <div class="card-price">PKR 245,000</div>
+          <button class="card-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.02 4c-4.87 0-8.83 3.95-8.83 8.82a8.8 8.8 0 0 0 1.18 4.42L3 21l3.87-1.35a8.83 8.83 0 0 0 4.15 1.05h.01c4.87 0 8.83-3.95 8.83-8.82a8.75 8.75 0 0 0-2.26-4.56Zm-5.58 13.55h-.01a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.8.98.94-2.72-.18-.28a7.34 7.34 0 0 1-1.13-3.94c0-4.07 3.32-7.38 7.4-7.38a7.36 7.36 0 0 1 7.38 7.4c0 4.07-3.32 7.38-7.4 7.38h-.16Z"/></svg>
+            Inquire on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="catalog-card">
+      <div class="catalog-card-inner">
+        <div class="card-img-wrap">
+          <div class="card-badge">Italian Marble</div>
+          <img src="https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?auto=format&fit=crop&w=1200&q=85" alt="Dining Table">
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Imperial Dining Set</h3>
+          <div class="card-price">PKR 380,000</div>
+          <button class="card-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.02 4c-4.87 0-8.83 3.95-8.83 8.82a8.8 8.8 0 0 0 1.18 4.42L3 21l3.87-1.35a8.83 8.83 0 0 0 4.15 1.05h.01c4.87 0 8.83-3.95 8.83-8.82a8.75 8.75 0 0 0-2.26-4.56Zm-5.58 13.55h-.01a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.8.98.94-2.72-.18-.28a7.34 7.34 0 0 1-1.13-3.94c0-4.07 3.32-7.38 7.4-7.38a7.36 7.36 0 0 1 7.38 7.4c0 4.07-3.32 7.38-7.4 7.38h-.16Z"/></svg>
+            Inquire on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="catalog-card">
+      <div class="catalog-card-inner">
+        <div class="card-img-wrap">
+          <div class="card-badge">Emerald Leather</div>
+          <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=85" alt="Accent Chair">
+        </div>
+        <div class="card-content">
+          <h3 class="card-title">Executive Accent Chair</h3>
+          <div class="card-price">PKR 85,000</div>
+          <button class="card-btn">
+            <svg viewBox="0 0 24 24"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.02 4c-4.87 0-8.83 3.95-8.83 8.82a8.8 8.8 0 0 0 1.18 4.42L3 21l3.87-1.35a8.83 8.83 0 0 0 4.15 1.05h.01c4.87 0 8.83-3.95 8.83-8.82a8.75 8.75 0 0 0-2.26-4.56Zm-5.58 13.55h-.01a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.8.98.94-2.72-.18-.28a7.34 7.34 0 0 1-1.13-3.94c0-4.07 3.32-7.38 7.4-7.38a7.36 7.36 0 0 1 7.38 7.4c0 4.07-3.32 7.38-7.4 7.38h-.16Z"/></svg>
+            Inquire on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Al-Noor Luxury Furniture — Islamabad, Pakistan.</p>
+</footer>
+
+<!-- 8D Floating WhatsApp -->
+<a href="https://wa.me/923001234567" target="_blank" class="wa-float-8d" title="Chat with us on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.02 4c-4.87 0-8.83 3.95-8.83 8.82a8.8 8.8 0 0 0 1.18 4.42L3 21l3.87-1.35a8.83 8.83 0 0 0 4.15 1.05h.01c4.87 0 8.83-3.95 8.83-8.82a8.75 8.75 0 0 0-2.26-4.56Zm-5.58 13.55h-.01a7.4 7.4 0 0 1-3.77-1.03l-.27-.16-2.8.98.94-2.72-.18-.28a7.34 7.34 0 0 1-1.13-3.94c0-4.07 3.32-7.38 7.4-7.38a7.36 7.36 0 0 1 7.38 7.4c0 4.07-3.32 7.38-7.4 7.38h-.16Zm4.05-5.53c-.22-.11-1.31-.65-1.52-.72-.2-.08-.35-.11-.5.11-.15.22-.57.72-.7.87-.13.15-.26.17-.48.06-.22-.11-.94-.35-1.79-1.11a6.7 6.7 0 0 1-1.24-1.55c-.13-.22-.01-.34.1-.45.1-.1.22-.26.33-.4.11-.13.15-.22.22-.37.07-.15.04-.28-.02-.4-.06-.11-.5-1.21-.68-1.66-.18-.44-.36-.38-.5-.38h-.43c-.15 0-.4.06-.6.28-.2.22-.79.77-.79 1.87s.81 2.17.92 2.32c.11.15 1.6 2.44 3.87 3.42.54.23.96.37 1.29.48.54.17 1.04.15 1.43.09.44-.06 1.31-.53 1.49-1.05.19-.51.19-.95.13-1.05-.06-.09-.2-.15-.42-.26Z"/></svg>
+</a>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- Vanilla JS for Micro-Interactions -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Scroll Reveal Observer with bouncy easing
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.15 });
+
+    const cards = document.querySelectorAll('.catalog-card');
+    cards.forEach((card, index) => {
+      card.style.transition = `opacity 0.8s ease ${index * 0.15}s, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 0.15}s`;
+      observer.observe(card);
+    });
+
+    // Immersive 8D Magnetic Tilt & Shadow Casting
+    cards.forEach(card => {
+      const inner = card.querySelector('.catalog-card-inner');
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Exaggerated smooth tilt
+        const rotateX = ((y - centerY) / centerY) * -12;
+        const rotateY = ((x - centerX) / centerX) * 12;
+        
+        inner.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.03, 1.03, 1.03)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        inner.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      });
+    });
+  });
+</script>
+
+<!-- Three.js ES modules -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var canvas = document.getElementById('webgl');
+var loader = document.getElementById('loader');
+var loadPct = document.getElementById('loadPct');
+var errorBox = document.getElementById('load-error');
+
+function lerp(a, b, t){ return a + (b - a) * t; }
+function clamp01(v){ return Math.min(1, Math.max(0, v)); }
+function mapRange(p, a, b){ return clamp01((p - a) / (b - a)); }
+
+var scene = new THREE.Scene();
+// Brightened fog to match light ivory theme
+scene.fog = new THREE.Fog(0xF9F8F6, 7, 18); 
+
+var camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
+
+// Using alpha: true to let CSS background radial gradient shine through
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x000000, 0); 
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3; // Boosted exposure for brighter look
+
+var pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// -------------------------------------------------------------
+// STUDIO SHOWROOM LIGHTING UPGRADE
+// -------------------------------------------------------------
+var ambient = new THREE.AmbientLight(0xffffff, 2.5); // Brighter ambient
+scene.add(ambient);
+
+// Crisp, bright warm key light
+var key = new THREE.DirectionalLight(0xfff5e6, 3.5);
+key.position.set(3.4, 6.2, 4.2);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.radius = 8; // Softer shadows for luxury feel            
+key.shadow.blurSamples = 16;
+key.shadow.camera.left = -4;
+key.shadow.camera.right = 4;
+key.shadow.camera.top = 4;
+key.shadow.camera.bottom = -4;
+key.shadow.camera.near = 0.5;
+key.shadow.camera.far = 16;
+key.shadow.bias = -0.0015;
+scene.add(key);
+
+// Golden area fill for that rich champagne vibe
+var fillLight = new THREE.PointLight(0xffd700, 1.8, 20);
+fillLight.position.set(-4.0, 3, -2.0);
+scene.add(fillLight);
+
+// Cool white rim light to define edges clearly against bright background
+var rimLight = new THREE.PointLight(0xffffff, 1.5, 15);
+rimLight.position.set(1.0, 4, -5.0);
+scene.add(rimLight);
+
+// Floor specifically tailored to cast soft shadow on bright background
+var floor = new THREE.Mesh(
+  new THREE.CircleGeometry(6, 64),
+  new THREE.ShadowMaterial({ opacity: 0.12, color: 0x1A1814 }) // Light shadow
+);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+var sofaRig = new THREE.Group();
+scene.add(sofaRig);
+var modelLoaded = false;
+
+var dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+
+var gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
+
+gltfLoader.load(
+  'sofa.glb',
+  function (gltf) {
+    var model = gltf.scene;
+
+    model.traverse(function (node) {
+      if (node.isMesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+        if (node.material) {
+          node.material.envMapIntensity = 1.2; // Extra reflection boost
+        }
+      }
+    });
+
+    var box = new THREE.Box3().setFromObject(model);
+    var size = box.getSize(new THREE.Vector3());
+    var maxDim = Math.max(size.x, size.y, size.z) || 1;
+    var targetSize = 2.6;
+    var scale = targetSize / maxDim;
+    model.scale.setScalar(scale);
+
+    var box2 = new THREE.Box3().setFromObject(model);
+    var center2 = box2.getCenter(new THREE.Vector3());
+    model.position.x -= center2.x;
+    model.position.z -= center2.z;
+
+    var box3 = new THREE.Box3().setFromObject(model);
+    model.position.y -= box3.min.y;
+
+    sofaRig.add(model);
+    modelLoaded = true;
+
+    setBaseCameraZ();
+    updateSceneFromProgress(lastProgress);
+
+    setTimeout(function () { loader.classList.add('hidden'); }, 300);
+  },
+  function (xhr) {
+    if (xhr.total) {
+      loadPct.textContent = Math.round((xhr.loaded / xhr.total) * 100) + '%';
+    }
+  },
+  function (err) {
+    console.error('GLB load failed:', err);
+    loader.classList.add('hidden');
+    errorBox.classList.add('show');
+  }
+);
+
+var baseCamZ = 4.6;
+
+function setBaseCameraZ() {
+  var aspect = window.innerWidth / window.innerHeight;
+  var minAspect = 0.5, maxAspect = 1.9;
+  var farZ = 7.6, nearZ = 4.4;
+  var a = Math.min(Math.max(aspect, minAspect), maxAspect);
+  var t = (a - minAspect) / (maxAspect - minAspect);
+  baseCamZ = lerp(farZ, nearZ, t);
+
+  camera.fov = aspect < 0.6 ? 46 : 38;
+  camera.aspect = aspect;
+  camera.updateProjectionMatrix();
+}
+setBaseCameraZ();
+camera.position.set(0, 0.9, baseCamZ);
+
+var target = { rotY: 0, posX: 0, camZ: baseCamZ };
+var current = { rotY: 0, posX: 0, camZ: baseCamZ };
+var lastProgress = 0;
+
+function updateSceneFromProgress(p) {
+  lastProgress = p;
+  var s2 = mapRange(p, 0.3, 0.72);
+  var s3 = mapRange(p, 0.68, 1.0);
+
+  target.rotY = lerp(0, Math.PI, s2);
+  target.posX = lerp(0, 1.3, s2) - lerp(0, 1.3, s3);
+  target.camZ = baseCamZ - lerp(0, 1.1, s3);
+}
+
+gsap.registerPlugin(ScrollTrigger);
+
+ScrollTrigger.create({
+  trigger: '.content-wrapper',
+  start: 'top top',
+  end: 'bottom bottom',
+  scrub: 0.6,
+  onUpdate: function (self) { updateSceneFromProgress(self.progress); }
+});
+
+// Snappy GSAP text reveals
+document.querySelectorAll('.text-block').forEach(function (el) {
+  gsap.fromTo(el,
+    { opacity: 0, y: 50, scale: 0.95 },
+    {
+      opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'power3.out',
+      scrollTrigger: {
+        trigger: el, start: 'top 85%', end: 'top 30%',
+        toggleActions: 'play reverse play reverse'
+      }
+    }
+  );
+});
+
+var mouseX = 0, mouseY = 0;
+if (!reducedMotion) {
+  window.addEventListener('pointermove', function (e) {
+    mouseX = (e.clientX / window.innerWidth) - 0.5;
+    mouseY = (e.clientY / window.innerHeight) - 0.5;
+  });
+}
+
+var clock = new THREE.Clock();
+var lookTarget = new THREE.Vector3(0, 0.35, 0);
+
+function animate() {
+  requestAnimationFrame(animate);
+  var t = clock.getElapsedTime();
+
+  var idleY = reducedMotion || !modelLoaded ? 0 : Math.sin(t * 0.6) * 0.045;
+  var idleRot = reducedMotion || !modelLoaded ? 0 : Math.sin(t * 0.4) * 0.018;
+
+  current.rotY = lerp(current.rotY, target.rotY, 0.07);
+  current.posX = lerp(current.posX, target.posX, 0.07);
+  current.camZ = lerp(current.camZ, target.camZ, 0.06);
+
+  sofaRig.rotation.y = current.rotY + idleRot;
+  sofaRig.position.x = current.posX;
+  sofaRig.position.y = idleY;
+
+  camera.position.z = current.camZ;
+  var parX = reducedMotion ? 0 : mouseX * 0.35;
+  var parY = reducedMotion ? 0.9 : 0.9 - mouseY * 0.18;
+  camera.position.x = lerp(camera.position.x, parX, 0.04);
+  camera.position.y = lerp(camera.position.y, parY, 0.04);
+
+  lookTarget.set(current.posX * 0.3, 0.35, 0);
+  camera.lookAt(lookTarget);
+
+  renderer.render(scene, camera);
+}
+animate();
+
+var resizeTimer;
+window.addEventListener('resize', function () {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function () {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    setBaseCameraZ();
+    updateSceneFromProgress(lastProgress);
+    ScrollTrigger.refresh();
+  }, 150);
+});
+</script>
+</body>
+</html>
